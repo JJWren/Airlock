@@ -1,0 +1,33 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+build/
+dist/
+
+# --- IDEs (PyCharm) ---
+.idea/
+*.iml
+.vscode/
+
+# --- Environment & Secrets ---
+.env
+.env.*
+*.key
+*.pem
+
+# --- Docker ---
+.docker/
+
+# --- OS Specific ---
+.DS_Store
+Thumbs.db
+
+# --- Project Specific (Udall Guard) ---
+uploads/
+temp_scan/
+*.msi
+*.exe
