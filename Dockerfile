@@ -8,6 +8,7 @@ WORKDIR /app
 # Install system dependencies for Subprocess and Networking
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the Syft binary from Stage 1 to the local destination
