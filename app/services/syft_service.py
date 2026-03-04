@@ -1,6 +1,6 @@
 import subprocess
 import json
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 
 class SyftService:
@@ -15,7 +15,7 @@ class SyftService:
 
     def generate_sbom(self, target_path: str) -> Dict[str, Any]:
         """
-        Executes Syft against a target directory and returns the CycloneDX JSON.
+        Executes Syft against a target directory and returns the JSON.
         """
         try:
             # -o JSON tells Syft to output the raw data structure
@@ -33,7 +33,6 @@ class SyftService:
         except subprocess.CalledProcessError as e:
             # If Syft fails, we capture the error and re-raise it for the API layer
             error_msg = e.stderr or "Syft execution failed with an unknown error."
-            raise RuntimeError(f"Scanner Error: {error_msg}")
+            raise RuntimeError(f"Scanner Error: {error_msg}") from e
         except json.JSONDecodeError:
             raise RuntimeError("Scanner Error: Received invalid JSON from the Syft CLI.")
-        

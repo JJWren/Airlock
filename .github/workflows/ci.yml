@@ -21,6 +21,18 @@ jobs:
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: |
+          # Prepare .env for docker-compose
+          if [ -f .env.example ]; then
+            cp .env.example .env
+          else
+            touch .env
+          fi
+          
+          # Ensure NVD_API_KEY is set in .env for containers
+          sed -i '/^NVD_API_KEY=/d' .env || true
+          echo "NVD_API_KEY=${NVD_API_KEY}" >> .env
+          
+          # Build and start services
           docker-compose up -d --build
 
       - name: Run Pytest in Container

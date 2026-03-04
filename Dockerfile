@@ -1,5 +1,5 @@
 # Stage 1: Get the Syft binary
-FROM anchore/syft:latest as syft-binary
+FROM anchore/syft:v1.0.1 as syft-binary
 
 # Stage 2: Build the Airlock API
 FROM python:3.14-slim
@@ -23,4 +23,5 @@ COPY . .
 # Start the FastAPI server
 # Use the PORT environment variable passed from docker-compose
 # We default to 8000 if nothing is provided
-CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
+ENV PORT=8000
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

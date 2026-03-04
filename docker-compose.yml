@@ -8,7 +8,7 @@ services:
     env_file:
       - .env
     environment:
-      - PORT=${INTERNAL_PORT:-8000} # Pass the internal port to the container
+      - PORT=${AIRLOCK_API_INTERNAL_PORT:-8000} # Pass the internal port to the container
     volumes:
       - .:/app
     restart: always
