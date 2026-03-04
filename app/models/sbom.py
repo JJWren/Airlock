@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 
 class SBOMArtifact(BaseModel):
@@ -8,7 +8,7 @@ class SBOMArtifact(BaseModel):
     type: str  # e.g., 'python', 'deb', 'npm'
     locations: List[str]
     language: Optional[str] = None
-    cpes: List[str] = []
+    cpes: List[str] = Field(default_factory=list)
 
 class SBOMResponse(BaseModel):
     """The full schema returned by the SyftService."""

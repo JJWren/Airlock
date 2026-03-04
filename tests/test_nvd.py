@@ -1,4 +1,3 @@
-import pytest
 from app.services.nvd_service import NVDService
 from app.models.vulnerability import CVEData
 

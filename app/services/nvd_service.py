@@ -18,6 +18,8 @@ class NVDService:
         Queries NVD for a specific CPE and returns a list of CVEData objects.
         NVDLib handles the API 2.0 rate limits automatically when a key is provided.
         """
+        # KEY WARNING: This should be implemented asynchronously. Utilize the Httpx package/library to accomplish this.
+
         # 1. Guardrail error if api key is missing
         # TODO: Implement guardrail with useful error message (throw exception/error): ValueError? ConfigurationError?
 
@@ -33,3 +35,4 @@ class NVDService:
         #  - append those items to our empty list
 
         # TODO: return populated list of CVEData objects
+        raise NotImplementedError("NVDService.get_cves_by_cpe is not implemented yet.")
