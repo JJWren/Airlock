@@ -1,24 +1,37 @@
+import pytest
+from unittest.mock import MagicMock, patch
 from app.services.nvd_service import NVDService
 from app.models.vulnerability import CVEData
 
 
-def test_get_cves_by_cpe_returns_list_of_cvedata():
+@patch("app.services.nvd_service.nvdlib.searchCVE")
+def test_get_cves_by_cpe_with_mock(mock_search):
     """
-    Partner TDD TASK:
-    1. Implement the NVDService.get_cves_by_cpe logic.
-    2. Ensure it returns actual CVEData objects.
-    3. Once passing, replace this multiline comment with a proper docstring.
+    Verified Lead Test: Ensures NVDService maps raw NIST objects to CVEData
+    without making actual network calls.
     """
+    # 1. Create a mock CVE object resembling an NVDLib response
+    mock_cve = MagicMock()
+    mock_cve.id = "CVE-2026-12345"
+    mock_cve.descriptions = [MagicMock(value="Test vulnerability description")]
+    mock_cve.v31score = 7.5
+    mock_cve.v31severity = "HIGH"
+
+    # Configure the mock to return our fake CVE in a list
+    mock_search.return_value = [mock_cve]
+
     service = NVDService()
+    test_cpe = "cpe:2.3:a:test:product:1.0:*:*:*:*:*:*:*"
 
-    # Using a known legacy CPE that definitely has CVEs (Django 1.1)
-    test_cpe = "cpe:2.3:a:djangoproject:django:1.1:*:*:*:*:*:*:*"
-
-    # Act
+    # 2. Act
     results = service.get_cves_by_cpe(test_cpe)
 
-    # Assert
-    assert isinstance(results, list), "Should return a list"
-    if results:
-        assert isinstance(results[0], CVEData), "Items in list must be CVEData objects"
-        assert results[0].id.startswith("CVE-")
+    # 3. Assert
+    assert len(results) == 1
+    assert isinstance(results[0], CVEData)
+    assert results[0].id == "CVE-2026-12345"
+    assert results[0].base_score == 7.5
+    assert results[0].severity == "HIGH"
+
+    # Verify the API was called with the correct parameters
+    mock_search.assert_called_once()
