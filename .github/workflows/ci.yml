@@ -33,8 +33,8 @@ jobs:
           echo "NVD_API_KEY=${NVD_API_KEY}" >> .env
           
           # Build and start services
-          docker-compose up -d --build
+          docker compose up -d --build
 
       - name: Run Pytest in Container
         run: |
-          docker-compose exec -T api pytest tests/
+          docker compose exec -T api pytest tests/
