@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -20,5 +22,7 @@ class Settings(BaseSettings):
         extra="ignore"      # Ignore extra variables in .env not defined here
     )
 
-# Global instance for Dependency Injection
-settings = Settings()
+@lru_cache
+def get_settings() -> Settings:
+    """Return a cached Settings instance for use as a FastAPI dependency."""
+    return Settings()
