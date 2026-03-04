@@ -38,4 +38,4 @@ jobs:
 
       - name: Run Pytest in Container
         run: |
-          docker compose exec -T api pytest tests/
+          docker compose exec -T -e PYTHONPATH=/api pytest tests/
