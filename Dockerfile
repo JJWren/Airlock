@@ -2,7 +2,7 @@
 FROM anchore/syft:v1.0.1 as syft-binary
 
 # Stage 2: Build the Airlock API
-FROM python:3.14-slim
+FROM python:3.12-slim
 WORKDIR /app
 
 # Install system dependencies for Subprocess and Networking
