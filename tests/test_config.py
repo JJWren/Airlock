@@ -1,3 +1,5 @@
+import os
+
 from app.core.config import get_settings
 
 def test_settings_load_from_env():
@@ -8,5 +10,5 @@ def test_settings_load_from_env():
     # Assert: the settings reflect the environment variables we just set
     assert settings.nvd_api_key is not None
     assert len(settings.nvd_api_key) > 0
-    # Add a check for your specific app name
+    assert settings.api_v1_str == "/api/v1"
     assert settings.app_name == "Airlock"
