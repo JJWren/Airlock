@@ -4,16 +4,14 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    """
-    System configuration settings class.
-    """
+    """System configuration settings class."""
 
     # These fields match the .env keys (Pydantic is case-insensitive)
     app_name: str = "Airlock"
     api_v1_str: str = "/api/v1"
 
     # This will be populated by NVD_API_KEY in your .env
-    nvd_api_key: str = "{will_be_replaced_with_env_var}"
+    nvd_api_key: str
 
     # This inner class tells Pydantic WHERE to look for the secrets
     model_config = SettingsConfigDict(
