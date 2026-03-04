@@ -10,8 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy the Syft binary from Stage 1 to the system PATH
-COPY --from=syft-binary /usr/local/bin/syft /usr/local/bin/syft
+# Copy the Syft binary from Stage 1 to the local destination
+COPY --from=syft-binary /syft /usr/local/bin/syft
 
 # Install Python requirements
 COPY requirements.txt .
