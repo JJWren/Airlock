@@ -26,3 +26,4 @@ class Settings(BaseSettings):
 def get_settings() -> Settings:
     """Return a cached Settings instance for use as a FastAPI dependency."""
     return Settings()
+# test message
