@@ -42,6 +42,11 @@ class NVDService:
     async def get_cves_by_keyword(self, package_name: str, version: str) -> List[CVEData]:
         """Search NVD by keyword when CPE matching fails."""
         await asyncio.sleep(0.6)
+
+        if not self.api_key:
+            log.error("❌ NVD Query aborted: API Key missing from configuration.")
+            raise ValueError('API Key not provided or configured.')
+
         keyword = f"{package_name} {version}"
         params = {"keywordSearch": keyword}
 
