@@ -12,7 +12,7 @@ Airlock operates as a distributed suite of applications coordinated via Docker C
 2. **API Gateway (FastAPI):** A high-performance gateway using the Factory Pattern for clean initialization and middleware (CORS) management.
 3. **Correlation Service (The Brain):** An orchestration layer that bridges the SBOM generator and the vulnerability intelligence database. It aggressively cross-references multiple CPE guesses to ensure maximum detection accuracy.
 4. **Analysis Engine (Syft):** Interacts with the Syft binary to deconstruct software and generate CycloneDX SBOMs.
-5  **Enrichment Layer (NVD API 2.0):** An asynchronous service that queries NIST for real-time CVE data and CVSS severity scores.
+5.  **Enrichment Layer (NVD API 2.0):** An asynchronous service that queries NIST for real-time CVE data and CVSS severity scores.
 
 ---
 
