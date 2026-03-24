@@ -25,9 +25,9 @@ async def test_run_full_scan_orchestration():
 
     mock_cve = CVEData(
         id="CVE-2021-28363",
-        source_url="https://nvd.nist.gov/vuln/detail/CVE-2026-28363",
+        source_url="https://nvd.nist.gov/vuln/detail/CVE-2021-28363",
         severity="HIGH",
-        description="In OpenClaw before 2026.2.23, tools.exec.safeBins validation for sort could be bypassed..."
+        description="The urllib3 library 1.26.x before 1.26.4 for Python omits SSL certificate validation in some cases involving HTTPS to HTTPS proxies..."
     )
 
     # 2. Act: Patch the internal services so we don't run real binaries or APIs
