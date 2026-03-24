@@ -31,9 +31,6 @@ class CorrelationService:
             log.debug(f"⏭️  Skipping {name}: No CPEs provided by scanner.")
             return None
 
-        findings: List[CVEData] = []
-        valid_cpe = ""
-
         async with self.semaphore: # Ensures we don't spam the NVD
             # First Attempt: Use CPEs
             for cpe_entry in cpes:
