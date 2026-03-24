@@ -43,12 +43,16 @@ class NVDService:
         """Search NVD by keyword when CPE matching fails."""
         await asyncio.sleep(0.6)
         keyword = f"{package_name} {version}"
-        url = f"{self.base_url}?keywordSearch={keyword}"
+        params = {"keywordSearch": keyword}
 
         log.debug(f"🔍 Keyword Search: '{keyword}'")
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.get(url, headers=self.headers, timeout=30.0)
+                response = await client.get(
+                    self.base_url,
+                    headers=self.headers,
+                    params=params,
+                    timeout=30.0)
                 if response.status_code != 200:
                     log.error(f"❌ NVD Keyword API error: {response.status_code} for {package_name}")
                     return []
