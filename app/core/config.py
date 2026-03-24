@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     # These fields match the .env keys (Pydantic is case-insensitive)
     app_name: Optional[str] = None
     app_version: str = "1.0.0"
-    api_v1_str: Optional[str] = None
+    api_v1_str: str = "/api/v1"
     nvd_api_key: Optional[str] = None
     syft_binary_path: Optional[str] = None
     allowed_hosts: list[str] = ["http://localhost:8000"]
