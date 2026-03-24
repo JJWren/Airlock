@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 from typing import List
 from app.models.scan import ScanRequest
 from app.models.vulnerability import VulnerabilityReport
