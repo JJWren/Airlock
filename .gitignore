@@ -26,8 +26,12 @@ dist/
 .DS_Store
 Thumbs.db
 
-# --- Project Specific (Udall Guard) ---
+# --- Project Specific ---
 uploads/
 temp_scan/
 *.msi
 *.exe
+
+# --- Local Only ---
+bin/
+app/__pycache__/
