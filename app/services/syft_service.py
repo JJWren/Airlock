@@ -1,6 +1,7 @@
 import os, json, subprocess
 from typing import Dict, Any, Optional
 from app.core.config import get_settings, PROJECT_ROOT
+from app.core.logger import log
 
 
 class SyftService:
@@ -21,10 +22,13 @@ class SyftService:
         else:
             self.binary_path = raw_path
 
+        log.info(f"🛠️ Syft Service loaded using binary: {self.binary_path}")
+
     def generate_sbom(self, target_path: str) -> Dict[str, Any]:
         """
         Executes Syft against a target directory and returns the JSON.
         """
+        log.info(f"📁 Syft: Starting file analysis on {target_path}")
         try:
             scan_target = f"dir:{target_path}"
 
@@ -39,15 +43,14 @@ class SyftService:
             )
 
             if not result.stdout:
-                debug_info = f" | Stderr: {result.stderr}" if result.stderr else ""
-                raise RuntimeError(f"Scanner Error: Syft produced no output.{debug_info}")
+                log.error("❌ Syft: CLI completed but produced an empty stdout.")
+                raise RuntimeError("Scanner Error: Syft produced no output.")
 
-            # Parse the stdout string into a Python dictionary
-            return json.loads(result.stdout)
+            data = json.loads(result.stdout)
+            package_count = len(data.get("artifacts", []))
+            log.success(f"✅ Syft: Analysis complete. Found {package_count} artifacts.")
+            return data
 
         except subprocess.CalledProcessError as e:
-            # If Syft fails, we capture the error and re-raise it for the API layer
-            error_msg = e.stderr or "Syft execution failed with an unknown error."
-            raise RuntimeError(f"Scanner Error: {error_msg}") from e
-        except json.JSONDecodeError:
-            raise RuntimeError("Scanner Error: Received invalid JSON from the Syft CLI.")
+            log.error(f"❌ Syft CLI Error: {e.stderr}")
+            raise RuntimeError(f"Scanner Error: {e.stderr}") from e

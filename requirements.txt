@@ -9,3 +9,4 @@ python-dotenv==1.0.1
 pytest==8.3.5
 pytest-asyncio==0.23.8
 anyio[trio]==4.4.0
+loguru==0.7.3

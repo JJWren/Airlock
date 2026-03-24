@@ -6,12 +6,51 @@ This project directly addresses **NIST SP 800-53** controls (CM-8, SI-2) and **E
 ---
 
 # Project Flow & Architecture
-Airlock operates as a distributed suite of applications coordinated via Docker Compose:
+Airlock operates as a distributed suite of applications coordinated via Docker Compose. The backend is built on a modular "Service-Pattern" architecture:
 
 1. **Frontend (Vue 3):** A modern dashboard for uploading software artifacts and visualizing risk scores.
-2. **API Gateway (FastAPI):** A high-performance Python backend that orchestrates the scanning and vetting logic.
-3. **Analysis Engine (Syft):** An internal CLI worker that deconstructs software to generate a CycloneDX SBOM.
-4. **Enrichment Layer (NVD API 2.0):** An automated service that queries NIST for real-time CVE data and CVSS severity scores.
+2. **API Gateway (FastAPI):** A high-performance gateway using the Factory Pattern for clean initialization and middleware (CORS) management.
+3. **Correlation Service (The Brain):** An orchestration layer that bridges the SBOM generator and the vulnerability intelligence database. It aggressively cross-references multiple CPE guesses to ensure maximum detection accuracy.
+4. **Analysis Engine (Syft):** Interacts with the Syft binary to deconstruct software and generate CycloneDX SBOMs.
+5  **Enrichment Layer (NVD API 2.0):** An asynchronous service that queries NIST for real-time CVE data and CVSS severity scores.
+
+---
+
+# Development & Testing
+
+To ensure parity between Windows development and Linux deployment (the "Airlock"), we utilize a Dual-Loop testing strategy:
+
+## The Inner Loop (Local Development)
+Run tests natively in PyCharm for a fast feedback loop. Ensure your `.env` points to the local Syft binary:
+
+- **Variable:** `SYFT_BINARY_PATH=bin/syft.exe`
+- **Command:** Run via the PyCharm pytest runner.
+
+## The Outer Loop (Docker Deployment)
+Run tests inside the Linux container to verify production parity:
+```bash
+docker compose exec -T -e PYTHONPATH=/app api pytest tests/
+```
+
+---
+
+# Usage: Scanning Projects
+
+## Scanning the Airlock (Internal)
+To verify the API and scanner are working, you can scan the code inside the container:
+
+- **Endpoint:** `POST /api/v1/scan`
+- **Payload:** `{ "target_path": "/app" }`
+
+## Scanning External Host Projects
+To scan a project on your Windows machine, map it as a Bind Mount in docker-compose.yml:
+
+1. **Map the volume:** `- C:/Users/YourUser/Source/Project:/mnt/external_scan:ro`
+
+2. **Trigger the scan:**
+```json
+{ "target_path": "/mnt/external_scan" }
+```
 
 ---
 
@@ -20,14 +59,13 @@ To maintain code integrity and meet federal audit standards, all contributors mu
 
 ### 1. Branching Strategy 
    - `master`: Protected. Only contains production-ready, audited code.
-   - `staging`: Used for Final Integration Testing (UAT) before a release. 
    - `develop`: The main integration branch. All features must merge here first. 
    - `feature/[name]`: Create short-lived branches from `develop` for specific tasks (e.g., `feature/nvd-api-logic`).
 
 ### 2. Development Standards
-   - **No Secrets in Git:** Never commit `.env` files or API keys. Use the provided `.gitignore`.
+   - **No Secrets in Git:** Never commit `.env` files or API keys. Use the provided `.env.example`. Include a `.gitignore` and `.dockerignore`.
    - **Type Safety:** Use Pydantic models for all data structures to ensure "Clean OOP" and auto-generated documentation.
-   - **Async First:** All external network calls (NVD API) must be handled asynchronously using `HTTPX` to prevent blocking the scanner.
+   - **Async First:** All external network calls (NVD API) must be handled asynchronously.
 
 ### 3. Commit Messages
 Use descriptive, imperative labels:
@@ -48,6 +86,7 @@ fix: Fixed issue causing failed requests/responses.
 
 # Quick Start
 1. **Clone:** `git clone [repo-url]`
-2. **Setup Environment:** Create a `.env file` in the root with your `NVD_KEY`.
-3. **Install Dependencies:** `pip install -r requirements.txt` (_ensure your `.venv` is active_).
-4. **Launch:** `docker-compose up --build`
+2. **Setup Environment:** Copy `.env.example` to `.env` and provide your `NVD_API_KEY`.
+3. **Launch:** `docker-compose up --build -d`
+4. **Install Dependencies:** `pip install -r requirements.txt` (_ensure your `.venv` is active_).
+5. **Interact:** Visit http://localhost:8000/docs for the interactive Swagger UI and Health Check.

@@ -6,10 +6,13 @@ services:
       dockerfile: Dockerfile
     volumes:
       - .:/app
+      - ${SCAN_UPLOAD_PATH}:/uploads
     env_file:
       - .env
     container_name: airlock-api
     environment:
+      - PYTHONUNBUFFERED=1  # Forces immediate log flushing
+      - LOG_LEVEL=DEBUG
       - PORT=${AIRLOCK_API_INTERNAL_PORT:-8000} # Pass the internal port to the container
       - SYFT_BINARY_PATH=/usr/local/bin/syft
     ports:
