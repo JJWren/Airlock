@@ -1,12 +1,12 @@
 import os, json, subprocess
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from app.core.config import get_settings, PROJECT_ROOT
 
 
 class SyftService:
     """Internal service for interacting with the Syft CLI tool."""
 
-    def __init__(self, binary_path: str = None):
+    def __init__(self, binary_path: Optional[str] = None):
         """
         Initialize the service.
         If no path is provided, it pulls from the global settings.
