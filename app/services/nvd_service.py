@@ -74,15 +74,19 @@ class NVDService:
             metrics = cve.get("metrics", {})
 
             # Use CVSS v3.1 severity if available
-            cvss_v31 = metrics.get("cvssMetricV31", [{}])[0].get("cvssData", {})
+            cvss_v31_list = metrics.get("cvssMetricV31") or [{}]
+            cvss_v31 = cvss_v31_list[0].get("cvssData", {})
             severity = cvss_v31.get("baseSeverity", "UNKNOWN")
             score = cvss_v31.get("baseScore", 0.0)
+
+            descriptions_list = cve.get("descriptions") or [{}]
+            description_value = descriptions_list[0].get("value", "No description available")
 
             vulnerabilities.append(CVEData(
                 id=cve.get("id"),
                 severity=severity,
-                base_score=score,  # Add this to match your model
-                description=cve.get("descriptions", [{}])[0].get("value", "No description available"),
+                base_score=score,
+                description=description_value,
                 source_url=f"https://nvd.nist.gov/vuln/detail/{cve.get('id')}"
             ))
 
