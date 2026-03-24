@@ -56,8 +56,16 @@ class SyftService:
 
 
         except subprocess.CalledProcessError as e:
-            log.error(f"❌ Syft CLI Error: {e.stderr}")
-            raise RuntimeError(f"Scanner Error: {e.stderr}") from e
+            error_output = (e.stderr or "").strip()
+            if not error_output:
+                stdout_output = (getattr(e, "stdout", "") or "").strip()
+                if stdout_output:
+                    error_output = f"(no stderr; stdout: {stdout_output})"
+            if not error_output:
+                error_output = "Syft CLI failed without any error output."
+
+            log.error(f"❌ Syft CLI Error: {error_output}")
+            raise RuntimeError(f"Scanner Error: {error_output}") from e
 
         except json.JSONDecodeError as e:
             # Provide debug context if the binary produces 'garbage' output
