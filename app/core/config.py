@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     app_name: Optional[str] = None
     api_v1_str: Optional[str] = None
     nvd_api_key: Optional[str] = None
+    syft_binary_path: Optional[str] = None
 
     # This inner class tells Pydantic WHERE to look for the secrets
     model_config = SettingsConfigDict(

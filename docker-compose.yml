@@ -1,14 +1,18 @@
 services:
   api:
-    build: .
+    image: airlock-api:dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    env_file:
+      - .env
     container_name: airlock-api
+    environment:
+      - PORT=${AIRLOCK_API_INTERNAL_PORT:-8000} # Pass the internal port to the container
+      - SYFT_BINARY_PATH=/usr/local/bin/syft
     ports:
       # Format is EXTERNAL:INTERNAL
       - "${AIRLOCK_API_EXTERNAL_PORT:-8000}:${AIRLOCK_API_INTERNAL_PORT:-8000}"
-    env_file:
-      - .env
-    environment:
-      - PORT=${AIRLOCK_API_INTERNAL_PORT:-8000} # Pass the internal port to the container
-    volumes:
-      - .:/app
     restart: always
