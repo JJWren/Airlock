@@ -29,6 +29,9 @@ class SyftService:
         Executes Syft against a target directory and returns the JSON.
         """
         log.info(f"📁 Syft: Starting file analysis on {target_path}")
+
+        result = None
+
         try:
             scan_target = f"dir:{target_path}"
 
@@ -51,6 +54,17 @@ class SyftService:
             log.success(f"✅ Syft: Analysis complete. Found {package_count} artifacts.")
             return data
 
+
         except subprocess.CalledProcessError as e:
             log.error(f"❌ Syft CLI Error: {e.stderr}")
             raise RuntimeError(f"Scanner Error: {e.stderr}") from e
+
+        except json.JSONDecodeError as e:
+            # Provide debug context if the binary produces 'garbage' output
+            stdout_len = len(result.stdout) if result and result.stdout else 0
+            stderr_len = len(result.stderr) if result and result.stderr else 0
+            log.error(
+                f"❌ Syft: Failed to decode JSON output. "
+                f"stdout_length={stdout_len}, stderr_length={stderr_len}"
+            )
+            raise RuntimeError("Scanner Error: Syft produced invalid JSON output.") from e
