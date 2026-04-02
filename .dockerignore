@@ -1,0 +1,32 @@
+# 1. Local Binaries (Keeps the Windows .exe out of the Linux Image)
+bin/
+
+# 2. Python Artifacts
+**/__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 3. Environment & Secrets
+.env
+.venv/
+env/
+venv/
+ENV/
+
+# 4. Source Control & Metadata
+.git/
+.gitignore
+.dockerignore
+
+# 5. IDE Specifics
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 6. Docker Instructions (The container doesn't need its own recipes)
+Dockerfile
+docker-compose.yml

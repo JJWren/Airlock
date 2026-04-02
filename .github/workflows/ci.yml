@@ -1,0 +1,41 @@
+name: Airlock CI
+
+on:
+  push:
+    branches: [ "master", "staging", "develop" ]
+  pull_request:
+    branches: [ "master", "staging", "develop" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Builds
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Run
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        run: |
+          # Prepare .env for docker compose
+          if [ -f .env.example ]; then
+            cp .env.example .env
+          else
+            touch .env
+          fi
+          
+          # Ensure NVD_API_KEY is set in .env for containers
+          sed -i '/^NVD_API_KEY=/d' .env || true
+          echo "" >> .env
+          echo "NVD_API_KEY=${NVD_API_KEY}" >> .env
+          
+          # Build and start services
+          docker compose up -d --build
+
+      - name: Run Pytest in Container
+        run: |
+          docker compose exec -T -e PYTHONPATH=/app api pytest tests/
