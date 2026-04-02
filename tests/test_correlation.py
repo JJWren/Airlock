@@ -5,7 +5,7 @@ from app.models.vulnerability import CVEData
 
 
 @pytest.mark.asyncio
-async def test_run_full_scan_orchestration():
+async def test_scan_directory_orchestration():
     """
     Verifies that CorrelationService correctly triggers the scanner,
     passes CPEs to the NVD service, and assembles the final report.
@@ -38,10 +38,11 @@ async def test_run_full_scan_orchestration():
             mock_nvd.return_value = [mock_cve]
 
             service = CorrelationService()
-            results = await service.run_full_scan("C:/fake/path")
+            results, total_packages = await service.scan_directory("C:/fake/path")
 
     # 3. Assert: Verify the "Airlock" Handshake
     assert len(results) == 1
+    assert total_packages == 1
     report = results[0]
 
     # Check that data was mapped correctly to your VulnerabilityReport model
@@ -55,7 +56,7 @@ async def test_run_full_scan_orchestration():
 
 
 @pytest.mark.asyncio
-async def test_run_full_scan_fallback_to_keyword():
+async def test_scan_directory_fallback_to_keyword():
     """
     Ensures that if all CPEs return zero results, the service
     successfully falls back to a Keyword Search.
@@ -91,10 +92,11 @@ async def test_run_full_scan_fallback_to_keyword():
                 mock_keyword.return_value = [keyword_cve]
 
                 service = CorrelationService()
-                results = await service.run_full_scan("C:/fake/path")
+                results, total_packages = await service.scan_directory("C:/fake/path")
 
     # 3. Assert: Verify the fallback happened
     assert len(results) == 1
+    assert total_packages == 1
     report = results[0]
 
     # The 'cpe' field should indicate a keyword match was used

@@ -1,8 +1,10 @@
 import os
+from unittest.mock import patch
 from app.services.syft_service import SyftService
 from app.core.config import get_settings
 
 
+@patch.dict(os.environ, {"SYFT_BINARY_PATH": "syft"})
 def test_syft_can_scan_local_directory():
     """
     Verify that Syft can scan the current app directory and return a valid SBOM.
