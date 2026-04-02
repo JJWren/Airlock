@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     api_v1_str: str = "/api/v1"
     nvd_api_key: Optional[str] = None
     syft_binary_path: Optional[str] = None
-    allowed_hosts: list[str] = ["http://localhost:8000"]
+    allowed_hosts: list[str] = ["http://localhost:8000", "http://localhost:3000"]
 
     @field_validator("allowed_hosts", mode="before")
     @classmethod
