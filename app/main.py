@@ -15,7 +15,8 @@ def get_application() -> FastAPI:
     # 1. Set up Middleware (Essential for modern APIs)
     _app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.allowed_hosts,
+        # allow_origins=settings.allowed_hosts,
+        allow_origins=["http://localhost","http://localhost:3000","http://localhost:8000"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

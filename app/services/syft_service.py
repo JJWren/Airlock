@@ -1,78 +1,44 @@
-import os, json, subprocess
-from typing import Dict, Any, Optional
-from app.core.config import get_settings, PROJECT_ROOT
+import subprocess
+import json
+import os
 from app.core.logger import log
+from app.core import state
 
 
 class SyftService:
-    """Internal service for interacting with the Syft CLI tool."""
+    def __init__(self):
+        self.bin_path = os.getenv("SYFT_BINARY_PATH", "syft")
 
-    def __init__(self, binary_path: Optional[str] = None):
-        """
-        Initialize the service.
-        If no path is provided, it pulls from the global settings.
-        """
-        settings = get_settings()
-        raw_path = (binary_path or settings.syft_binary_path or "syft").strip('"')
+    def generate_sbom(self, target_path: str) -> dict:
+        """Executes Syft and registers the PID for the kill-switch."""
+        
+        # Explicitly format target path for Syft (e.g. dir:/path/to/scan)
+        formatted_target = f"dir:{target_path}" if os.path.isdir(target_path) else target_path
 
-        # Logic: If it looks like a relative path, anchor it to the Project Root
-        if not os.path.isabs(raw_path) and raw_path != "syft":
-            # This turns "bin/syft.exe" into "C:\...\Airlock\bin\syft.exe"
-            self.binary_path = str((PROJECT_ROOT / raw_path).resolve())
-        else:
-            self.binary_path = raw_path
-
-        log.info(f"🛠️ Syft Service loaded using binary: {self.binary_path}")
-
-    def generate_sbom(self, target_path: str) -> Dict[str, Any]:
-        """
-        Executes Syft against a target directory and returns the JSON.
-        """
-        log.info(f"📁 Syft: Starting file analysis on {target_path}")
-
-        result = None
-
+        cmd = [self.bin_path, formatted_target, "-o", "json", "-q"]
         try:
-            scan_target = f"dir:{target_path}"
-
-            # -o JSON tells Syft to output the raw data structure
-            # -q (quiet) suppresses the progress bars which would mess up stdout
-            result = subprocess.run(
-                [self.binary_path, scan_target, "-o", "json", "-q"],
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-                check=True
+            # We explicitly enforce UTF-8 decoding to handle special characters smoothly.
+            process = subprocess.Popen(
+                cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8"
             )
 
-            if not result.stdout:
-                log.error("❌ Syft: CLI completed but produced an empty stdout.")
-                raise RuntimeError("Scanner Error: Syft produced no output.")
+            # Register PID globally
+            state.active_scan_pid = process.pid
+            log.debug(f"📑 Registered Syft PID: {process.pid}")
 
-            data = json.loads(result.stdout)
-            package_count = len(data.get("artifacts", []))
-            log.success(f"✅ Syft: Analysis complete. Found {package_count} artifacts.")
-            return data
+            stdout, stderr = process.communicate()
+            state.active_scan_pid = None  # Clear on success
 
+            if process.returncode != 0:
+                log.error(f"❌ Syft failed: {stderr}")
+                return {"artifacts": []}
+                
+            if not stdout:
+                log.error("❌ Syft failed: stdout is empty.")
+                return {"artifacts": []}
 
-        except subprocess.CalledProcessError as e:
-            error_output = (e.stderr or "").strip()
-            if not error_output:
-                stdout_output = (getattr(e, "stdout", "") or "").strip()
-                if stdout_output:
-                    error_output = f"(no stderr; stdout: {stdout_output})"
-            if not error_output:
-                error_output = "Syft CLI failed without any error output."
-
-            log.error(f"❌ Syft CLI Error: {error_output}")
-            raise RuntimeError(f"Scanner Error: {error_output}") from e
-
-        except json.JSONDecodeError as e:
-            # Provide debug context if the binary produces 'garbage' output
-            stdout_len = len(result.stdout) if result and result.stdout else 0
-            stderr_len = len(result.stderr) if result and result.stderr else 0
-            log.error(
-                f"❌ Syft: Failed to decode JSON output. "
-                f"stdout_length={stdout_len}, stderr_length={stderr_len}"
-            )
-            raise RuntimeError("Scanner Error: Syft produced invalid JSON output.") from e
+            return json.loads(stdout)
+        except Exception as e:
+            state.active_scan_pid = None
+            log.error(f"⚠️ Syft failure: {str(e)}")
+            return {"artifacts": []}

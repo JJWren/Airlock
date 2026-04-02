@@ -1,21 +1,34 @@
 services:
   api:
     image: airlock-api:dev
+    container_name: airlock-api
     build:
       context: .
       dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
     volumes:
       - .:/app
       - ${SCAN_UPLOAD_PATH}:/uploads
     env_file:
       - .env
-    container_name: airlock-api
     environment:
       - PYTHONUNBUFFERED=1  # Forces immediate log flushing
       - LOG_LEVEL=DEBUG
-      - PORT=${AIRLOCK_API_INTERNAL_PORT:-8000} # Pass the internal port to the container
+      - PORT=8000
       - SYFT_BINARY_PATH=/usr/local/bin/syft
-    ports:
-      # Format is EXTERNAL:INTERNAL
-      - "${AIRLOCK_API_EXTERNAL_PORT:-8000}:${AIRLOCK_API_INTERNAL_PORT:-8000}"
     restart: always
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:8000/api/v1}
+    volumes:
+      - ./web:/app
+      - /app/node_modules # Important: Don't let Windows overwrite container modules
+    depends_on:
+      - api
