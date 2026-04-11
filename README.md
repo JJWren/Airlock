@@ -128,7 +128,7 @@ fix: Fixed issue causing failed requests/responses.
 
 | Layer | Technology |
 |---|---|
-| Frontend | Vue 3, Vite |
+| Frontend | React |
 | API | FastAPI, Uvicorn, Pydantic |
 | SBOM Generation | Anchore Syft (v1.0.1, CycloneDX) |
 | Vulnerability Data | NVD via `nvdlib`, `httpx`, `tenacity` |
