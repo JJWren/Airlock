@@ -10,7 +10,7 @@ This project directly addresses **NIST SP 800-53** controls (CM-8, SI-2) and **E
 
 Airlock operates as a distributed suite of applications coordinated via Docker Compose. The backend is built on a modular "Service-Pattern" architecture:
 
-1. **Frontend (Vue 3 + Vite):** A modern dashboard served on port `3000` for uploading software artifacts and visualizing risk scores. Communicates with the API via a configurable `VITE_API_BASE_URL`.
+1. **Frontend (React):** A modern dashboard served on port `3000` for uploading software artifacts and visualizing risk scores. Communicates with the API via a configurable `VITE_API_BASE_URL`.
 2. **API Gateway (FastAPI):** A high-performance gateway on port `8000` using the Factory Pattern for clean initialization and middleware (CORS) management. Exposes interactive Swagger docs at `/docs`. Supports **file uploads** via `python-multipart` and **real-time scan progress** streamed to the frontend via **Server-Sent Events (SSE)**.
 3. **Correlation Service (The Brain):** An orchestration layer that bridges the SBOM generator and the vulnerability intelligence database. It aggressively cross-references multiple CPE guesses to ensure maximum detection accuracy.
 4. **Analysis Engine (Syft):** Interacts with the [Anchore Syft](https://github.com/anchore/syft) binary (v1.0.1) to deconstruct software and generate CycloneDX SBOMs.
