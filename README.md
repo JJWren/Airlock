@@ -52,7 +52,7 @@ docker compose exec -T -e PYTHONPATH=/app api pytest tests/
 
 ## Uploading Software Artifacts
 
-The primary workflow is to **upload a file** through the Vue dashboard (port `3000`) or via the API directly:
+The primary workflow is to **upload a file** through the React dashboard (port `3000`) or via the API directly:
 
 * **Endpoint:** `POST /api/v1/scan`
 * Files are received by FastAPI and stored in the `/uploads` volume inside the container.
@@ -119,7 +119,7 @@ fix: Fixed issue causing failed requests/responses.
 3. **Launch:** `docker-compose up --build -d`
 4. **Install Dependencies (local dev):** `pip install -r requirements.txt` (*ensure your `.venv` is active*).
 5. **Interact:**
-   * **Vue Dashboard:** [http://localhost:3000](http://localhost:3000) — upload artifacts, view scan results, and download PDF reports.
+   * **React Dashboard:** [http://localhost:3000](http://localhost:3000) — upload artifacts, view scan results, and download PDF reports.
    * **Swagger API Docs:** [http://localhost:8000/docs](http://localhost:8000/docs) — explore and test API endpoints directly.
 
 ---
